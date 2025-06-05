@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Alert } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
-import { getPlaylists, updatePlaylist } from '../services/storage';
+import { getPlaylists, updatePlaylist } from '../services/storage.js';
 
 export default function EditPlaylistScreen({ route, navigation }) {
   const { id } = route.params;

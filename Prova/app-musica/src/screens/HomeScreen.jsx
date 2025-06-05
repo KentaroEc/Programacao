@@ -100,14 +100,14 @@ export default function HomeScreen() {
 
   if (erro) {
     return (
-      <View style={{ padding: 20 }}>
-        <Text variant="titleMedium" style={{ color: 'red' }}>{erro}</Text>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text variant="titleMedium" style={styles.erro}>{erro}</Text>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <FlatList
         data={musicas}
         keyExtractor={item => item.id}
@@ -115,19 +115,26 @@ export default function HomeScreen() {
           <List.Item
             title={item.filename}
             description={`Duração: ${(item.duration / 60).toFixed(2)} min`}
-            left={props => <List.Icon {...props} icon="music" />}
-            right={props => <IconButton icon="play" onPress={() => tocarMusica(item)} />}
+            titleStyle={styles.titulo}
+            descriptionStyle={styles.descricao}
+            style={styles.item}
+            left={props => <List.Icon {...props} icon="music" color="#E85BDA" />}
+            right={props => (
+              <IconButton icon="play" iconColor="#E85BDA" onPress={() => tocarMusica(item)} />
+            )}
           />
         )}
-        ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20 }}>Nenhuma música encontrada</Text>}
+        ListEmptyComponent={
+          <Text style={styles.nenhuma}>Nenhuma música encontrada</Text>
+        }
       />
 
       {tocando && (
         <View style={styles.miniPlayer}>
-          <Text numberOfLines={1} style={{ flex: 1 }}>{tocando.filename}</Text>
-          <IconButton icon="skip-previous" onPress={musicaAnterior} />
-          <IconButton icon={isPlaying ? 'pause' : 'play'} onPress={togglePlayPause} />
-          <IconButton icon="skip-next" onPress={proximaMusica} />
+          <Text numberOfLines={1} style={styles.miniTitulo}>{tocando.filename}</Text>
+          <IconButton icon="skip-previous" iconColor="#FFFFFF" onPress={musicaAnterior} />
+          <IconButton icon={isPlaying ? 'pause' : 'play'} iconColor="#FFFFFF" onPress={togglePlayPause} />
+          <IconButton icon="skip-next" iconColor="#FFFFFF" onPress={proximaMusica} />
         </View>
       )}
     </View>
@@ -135,12 +142,41 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#1C0A26',
+  },
+  item: {
+    backgroundColor: '#2A0F3A',
+    marginHorizontal: 10,
+    marginVertical: 4,
+    borderRadius: 8,
+  },
+  titulo: {
+    color: '#FFFFFF',
+  },
+  descricao: {
+    color: '#C7A3D6',
+  },
+  nenhuma: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#FFFFFF',
+  },
   miniPlayer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#bababa',
+    padding: 12,
+    backgroundColor: '#912db5',
     borderTopWidth: 1,
-    borderColor: '#CCC',
+    borderColor: '#3D2F4C',
+  },
+  miniTitulo: {
+    flex: 1,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  erro: {
+    color: '#E74C3C',
   },
 });
