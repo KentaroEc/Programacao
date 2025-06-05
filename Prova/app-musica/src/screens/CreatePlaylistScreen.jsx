@@ -56,7 +56,7 @@ export default function CreatePlaylistScreen({ navigation }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <ScrollView contentContainerStyle={{ padding: 16 ,marginTop: 35 }}>
       <Text variant="titleMedium" style={{ marginBottom: 10 }}>Nova Playlist</Text>
 
       <TextInput label="Nome" value={form.nome} onChangeText={text => handleChange('nome', text)} style={{ marginBottom: 10 }} />
