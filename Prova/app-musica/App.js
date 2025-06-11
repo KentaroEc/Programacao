@@ -17,7 +17,7 @@ import EditPlaylistScreen from './src/screens/EditPlaylistScreen.jsx';
 import StatisticsScreen from './src/screens/StatisticsScreen.jsx';
 
 // CONTEXTO DO PLAYER
-import { PlayerProvider } from './src/contexts/PlayerContext.jsx';
+// import { PlayerProvider } from './src/contexts/PlayerContext.jsx';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -120,7 +120,6 @@ function DrawerNavigator() {
 export default function App() {
   return (
     <PaperProvider>
-      <PlayerProvider>
         <NavigationContainer
           theme={{
             ...DefaultTheme,
@@ -136,7 +135,6 @@ export default function App() {
             <Stack.Screen name="EditarPlaylist" component={EditPlaylistScreen} />
           </Stack.Navigator>
         </NavigationContainer>
-      </PlayerProvider>
     </PaperProvider>
   );
 }
