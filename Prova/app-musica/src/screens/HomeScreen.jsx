@@ -17,7 +17,7 @@ export default function HomeScreen() {
     async function carregarMusicas() {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        setErro('Permissão negada para acessar arquivos de mídia.');
+        Alert.alert("Permissão negada", "Ative o acesso a arquivos para carregar as músicas.");
         setCarregando(false);
         return;
       }
@@ -108,25 +108,36 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <List.Subheader style={styles.subheader}>
+        {musicas.length} músicas encontradas
+      </List.Subheader>
+
       <FlatList
         data={musicas}
         keyExtractor={item => item.id}
+        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
         renderItem={({ item }) => (
           <List.Item
             title={item.filename}
-            description={`Duração: ${(item.duration / 60).toFixed(2)} min`}
+            description={`Duração: ${Math.floor(item.duration / 60)}:${(item.duration % 60).toFixed(0).padStart(2, '0')}`}
             titleStyle={styles.titulo}
             descriptionStyle={styles.descricao}
             style={styles.item}
+            onPress={() => tocarMusica(item)}
             left={props => <List.Icon {...props} icon="music" color="#E85BDA" />}
             right={props => (
-              <IconButton icon="play" iconColor="#E85BDA" onPress={() => tocarMusica(item)} />
+              tocando?.id === item.id ? (
+                <IconButton icon="equalizer" iconColor="#E85BDA" />
+              ) : (
+                <IconButton icon="play" iconColor="#E85BDA" onPress={() => tocarMusica(item)} />
+              )
             )}
           />
         )}
         ListEmptyComponent={
           <Text style={styles.nenhuma}>Nenhuma música encontrada</Text>
         }
+        contentContainerStyle={{ paddingBottom: 0 }}
       />
 
       {tocando && (
@@ -145,6 +156,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1C0A26',
+  },
+  subheader: {
+    color: '#ccc',
+    marginLeft: 10,
   },
   item: {
     backgroundColor: '#2A0F3A',

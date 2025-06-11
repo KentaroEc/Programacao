@@ -16,6 +16,9 @@ import CreatePlaylistScreen from './src/screens/CreatePlaylistScreen.jsx';
 import EditPlaylistScreen from './src/screens/EditPlaylistScreen.jsx';
 import StatisticsScreen from './src/screens/StatisticsScreen.jsx';
 
+// CONTEXTO DO PLAYER
+import { PlayerProvider } from './src/contexts/PlayerContext.jsx';
+
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tabs = createBottomTabNavigator();
@@ -117,21 +120,23 @@ function DrawerNavigator() {
 export default function App() {
   return (
     <PaperProvider>
-      <NavigationContainer
-        theme={{
-          ...DefaultTheme,
-          colors: {
-            ...DefaultTheme.colors,
-            background: backgroundColor,
-          },
-        }}
-      >
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Drawer" component={DrawerNavigator} />
-          <Stack.Screen name="CriarPlaylist" component={CreatePlaylistScreen} />
-          <Stack.Screen name="EditarPlaylist" component={EditPlaylistScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <PlayerProvider>
+        <NavigationContainer
+          theme={{
+            ...DefaultTheme,
+            colors: {
+              ...DefaultTheme.colors,
+              background: backgroundColor,
+            },
+          }}
+        >
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Drawer" component={DrawerNavigator} />
+            <Stack.Screen name="CriarPlaylist" component={CreatePlaylistScreen} />
+            <Stack.Screen name="EditarPlaylist" component={EditPlaylistScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </PlayerProvider>
     </PaperProvider>
   );
 }

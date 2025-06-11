@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 import * as MediaLibrary from 'expo-media-library';
 import { Audio } from 'expo-av';
+import Slider from '@react-native-community/slider';
 
 const primaryColor = '#912db5';
 const backgroundColor = '#1a0822';
@@ -11,6 +12,8 @@ export default function PlayerScreen() {
   const [musicas, setMusicas] = useState([]);
   const [indexAtual, setIndexAtual] = useState(0);
   const [tocando, setTocando] = useState(false);
+  const [posicao, setPosicao] = useState(0);
+  const [duracao, setDuracao] = useState(1);
 
   const soundRef = useRef(null);
 
@@ -58,8 +61,13 @@ export default function PlayerScreen() {
     setTocando(true);
 
     sound.setOnPlaybackStatusUpdate((status) => {
-      if (status.didJustFinish) {
-        proximaMusica();
+      if (status.isLoaded) {
+        setDuracao(status.durationMillis || 1);
+        setPosicao(status.positionMillis || 0);
+
+        if (status.didJustFinish) {
+          proximaMusica();
+        }
       }
     });
   };
@@ -95,11 +103,43 @@ export default function PlayerScreen() {
     tocarMusica();
   };
 
+  const formatarTempo = (millis) => {
+    const totalSegundos = Math.floor(millis / 1000);
+    const minutos = Math.floor(totalSegundos / 60);
+    const segundos = totalSegundos % 60;
+    return `${minutos}:${segundos.toString().padStart(2, '0')}`;
+  };
+
+  const aoSoltarSlider = async (value) => {
+    if (soundRef.current) {
+      await soundRef.current.setPositionAsync(value);
+    }
+  };
+
   return (
     <View style={estilos.container}>
       <Text variant="titleLarge" style={estilos.texto}>
         {musicas.length > 0 ? musicas[indexAtual].filename : 'Nenhuma música carregada'}
       </Text>
+
+      {musicas.length > 0 && (
+        <>
+          <Slider
+            style={{ width: 300, height: 40 }}
+            minimumValue={0}
+            maximumValue={duracao}
+            value={posicao}
+            onSlidingComplete={aoSoltarSlider}
+            minimumTrackTintColor="#fff"
+            maximumTrackTintColor="#888"
+            thumbTintColor="#fff"
+          />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: 300 }}>
+            <Text style={{ color: '#ccc' }}>{formatarTempo(posicao)}</Text>
+            <Text style={{ color: '#ccc' }}>{formatarTempo(duracao)}</Text>
+          </View>
+        </>
+      )}
 
       <View style={estilos.controles}>
         <IconButton
@@ -143,7 +183,6 @@ const estilos = StyleSheet.create({
   controles: {
     flexDirection: 'row',
     gap: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: 10,
   },
 });
