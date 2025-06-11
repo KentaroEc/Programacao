@@ -21,13 +21,6 @@ export const savePlaylists = async (playlists) => {
   }
 };
 
-
-//export const addPlaylist = async (playlist) => {
-//  const playlists = await getPlaylists();
-//  playlists.push(playlist);
-//  await savePlaylists(playlists);
-//};
-
 export const addPlaylist = async (playlist) => {
   try {
     const playlists = await getPlaylists();
@@ -39,7 +32,6 @@ export const addPlaylist = async (playlist) => {
     console.error("Erro no addPlaylist:", error);
   }
 };
-
 
 export const updatePlaylist = async (id, newData) => {
   let playlists = await getPlaylists();

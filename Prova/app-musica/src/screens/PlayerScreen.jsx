@@ -4,6 +4,9 @@ import { Text, IconButton } from 'react-native-paper';
 import * as MediaLibrary from 'expo-media-library';
 import { Audio } from 'expo-av';
 
+const primaryColor = '#912db5';
+const backgroundColor = '#1a0822';
+
 export default function PlayerScreen() {
   const [musicas, setMusicas] = useState([]);
   const [indexAtual, setIndexAtual] = useState(0);
@@ -22,7 +25,12 @@ export default function PlayerScreen() {
         sortBy: [MediaLibrary.SortBy.default],
       });
 
-      setMusicas(resultado.assets);
+      const extensoesAceitas = ['.mp3'];
+      const filtradas = resultado.assets.filter(item =>
+        extensoesAceitas.some(ext => item.filename.toLowerCase().endsWith(ext))
+      );
+
+      setMusicas(filtradas);
     }
 
     carregarMusicas();
@@ -78,6 +86,15 @@ export default function PlayerScreen() {
     tocarMusica();
   };
 
+  const musicaAnterior = async () => {
+    if (musicas.length === 0) return;
+
+    let novoIndex = indexAtual - 1;
+    if (novoIndex < 0) novoIndex = musicas.length - 1;
+    setIndexAtual(novoIndex);
+    tocarMusica();
+  };
+
   return (
     <View style={estilos.container}>
       <Text variant="titleLarge" style={estilos.texto}>
@@ -86,13 +103,21 @@ export default function PlayerScreen() {
 
       <View style={estilos.controles}>
         <IconButton
+          icon="skip-previous"
+          size={40}
+          iconColor="#fff"
+          onPress={musicaAnterior}
+        />
+        <IconButton
           icon={tocando ? "pause" : "play"}
           size={40}
+          iconColor="#fff"
           onPress={tocando ? pausarOuContinuar : tocarMusica}
         />
         <IconButton
           icon="skip-next"
           size={40}
+          iconColor="#fff"
           onPress={proximaMusica}
         />
       </View>
@@ -104,14 +129,21 @@ const estilos = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: backgroundColor,
+    padding: 20,
   },
   texto: {
     marginBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
   },
   controles: {
     flexDirection: 'row',
-    gap: 20
-  }
+    gap: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

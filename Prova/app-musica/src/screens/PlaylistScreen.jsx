@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Alert } from 'react-native';
-import { List, FAB } from 'react-native-paper';
+import { View, Alert, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { List, FAB, Text } from 'react-native-paper';
 import { useIsFocused } from '@react-navigation/native';
 import { getPlaylists, deletePlaylist } from '../services/storage.js';
+
+const backgroundColor = '#1a0822';
+const cardColor = '#2b1b37';
+const textColor = '#fff';
+const primaryColor = '#912db5';
 
 export default function PlaylistScreen({ navigation }) {
   const [playlists, setPlaylists] = useState([]);
@@ -30,28 +35,65 @@ export default function PlaylistScreen({ navigation }) {
     ]);
   };
 
+  const renderItem = ({ item }) => (
+    <List.Item
+      title={item.nome}
+      description={item.descricao}
+      titleStyle={{ color: textColor }}
+      descriptionStyle={{ color: '#ccc' }}
+      style={{ backgroundColor: cardColor }}
+      left={props => <List.Icon {...props} icon="playlist-music" color={primaryColor} />}
+      right={props => (
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => navigation.navigate('EditarPlaylist', { id: item.id })}>
+            <List.Icon {...props} icon="pencil" color="#aaa" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => confirmarExclusao(item.id)}>
+            <List.Icon {...props} icon="delete" color="#ff5555" />
+          </TouchableOpacity>
+        </View>
+      )}
+    />
+  );
+
   return (
-    <View style={{ flex: 1 }}>
-      {playlists.map(p => (
-        <List.Item
-          key={p.id}
-          title={p.nome}
-          description={p.descricao}
-          left={props => <List.Icon {...props} icon="playlist-music" />}
-          right={props => (
-            <>
-              <List.Icon {...props} icon="pencil" onPress={() => navigation.navigate('EditarPlaylist', { id: p.id })} />
-              <List.Icon {...props} icon="delete" onPress={() => confirmarExclusao(p.id)} />
-            </>
-          )}
+    <View style={styles.container}>
+      {playlists.length === 0 ? (
+        <Text style={styles.emptyText}>Nenhuma playlist criada ainda.</Text>
+      ) : (
+        <FlatList
+          data={playlists}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
         />
-      ))}
+      )}
 
       <FAB
         icon="plus"
-        style={{ position: 'absolute', right: 16, bottom: 16 }}
+        style={styles.fab}
         onPress={() => navigation.navigate('CriarPlaylist')}
+        color="#fff"
+        customSize={56}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: backgroundColor,
+  },
+  emptyText: {
+    color: '#ccc',
+    textAlign: 'center',
+    marginTop: 30,
+    fontSize: 16,
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    backgroundColor: primaryColor,
+  },
+});

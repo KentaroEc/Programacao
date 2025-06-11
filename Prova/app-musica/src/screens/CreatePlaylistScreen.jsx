@@ -4,7 +4,6 @@ import { TextInput, Button, Text } from 'react-native-paper';
 import { addPlaylist, getPlaylists } from '../services/storage.js';
 import { v4 as uuidv4 } from 'uuid';
 
-// Cores do tema
 const primaryColor = '#912db5';
 const backgroundColor = '#1a0822';
 
@@ -36,15 +35,11 @@ export default function CreatePlaylistScreen({ navigation }) {
 
     try {
       await addPlaylist(novaPlaylist);
-      const todas = await getPlaylists();
-
       Alert.alert('Sucesso!', 'Playlist salva com sucesso!');
-
       navigation.navigate('Drawer', {
         screen: 'Início',
         params: { screen: 'Playlists' }
       });
-
     } catch (error) {
       console.error("Erro ao salvar playlist:", error);
       Alert.alert('Erro ao salvar a playlist.');
@@ -61,6 +56,7 @@ export default function CreatePlaylistScreen({ navigation }) {
         onChangeText={text => handleChange('nome', text)}
         style={styles.input}
         mode="outlined"
+        theme={inputTheme}
       />
       <TextInput
         label="Descrição"
@@ -68,6 +64,7 @@ export default function CreatePlaylistScreen({ navigation }) {
         onChangeText={text => handleChange('descricao', text)}
         style={styles.input}
         mode="outlined"
+        theme={inputTheme}
       />
       <TextInput
         label="Gênero"
@@ -75,6 +72,7 @@ export default function CreatePlaylistScreen({ navigation }) {
         onChangeText={text => handleChange('genero', text)}
         style={styles.input}
         mode="outlined"
+        theme={inputTheme}
       />
       <TextInput
         label="Criador"
@@ -82,6 +80,7 @@ export default function CreatePlaylistScreen({ navigation }) {
         onChangeText={text => handleChange('criador', text)}
         style={styles.input}
         mode="outlined"
+        theme={inputTheme}
       />
       <TextInput
         label="Ano"
@@ -90,6 +89,7 @@ export default function CreatePlaylistScreen({ navigation }) {
         onChangeText={text => handleChange('ano', text)}
         style={styles.input}
         mode="outlined"
+        theme={inputTheme}
       />
 
       <Button mode="contained" onPress={salvar} buttonColor={primaryColor}>
@@ -98,6 +98,15 @@ export default function CreatePlaylistScreen({ navigation }) {
     </ScrollView>
   );
 }
+
+const inputTheme = {
+  colors: {
+    primary: '#912db5',
+    background: '#2b1b37',
+    text: '#fff',
+    placeholder: '#ccc',
+  }
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -114,5 +123,6 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 12,
     backgroundColor: '#2b1b37',
+    color: '#fff', // <- isso garante que o texto dentro apareça branco
   },
 });
