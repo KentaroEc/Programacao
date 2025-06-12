@@ -4,6 +4,7 @@ import { Text, IconButton, Surface } from 'react-native-paper';
 import * as MediaLibrary from 'expo-media-library';
 import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
+import { incrementPlayCount } from '../services/playcount'; // 👈 integração
 
 const primaryColor = '#912db5';
 const backgroundColor = '#1a0822';
@@ -58,6 +59,13 @@ export default function PlayerScreen() {
 
     soundRef.current = sound;
     setTocando(true);
+
+    // 👇 Incrementa contador
+    try {
+      await incrementPlayCount(musicas[indexAtual].id);
+    } catch (error) {
+      console.error("Erro ao contar reprodução:", error);
+    }
 
     sound.setOnPlaybackStatusUpdate((status) => {
       if (status.isLoaded) {
@@ -115,7 +123,7 @@ export default function PlayerScreen() {
     <View style={estilos.container}>
       <Surface style={estilos.card}>
         <Image
-          source={require('../assets/music-placeholder.png')} // substitua por imagem real, se desejar
+          source={require('../assets/music-placeholder.png')}
           style={estilos.imagem}
         />
 

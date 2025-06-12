@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Card, Title, Paragraph, Surface } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as MediaLibrary from 'expo-media-library';
+import { getPlayCount, getMostPlayed } from '../services/playcount';
 
 // Cores do tema
 const backgroundColor = '#1a0822';
@@ -10,6 +12,54 @@ const textColor = '#fff';
 const primaryColor = '#912db5';
 
 export default function StatisticsScreen() {
+  const [totalMusicas, setTotalMusicas] = useState(0);
+  const [tempoTotal, setTempoTotal] = useState(0);
+  const [musicaMaisReproduzida, setMusicaMaisReproduzida] = useState(null);
+
+  useEffect(() => {
+    async function carregarEstatisticas() {
+      // Conta músicas locais
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') return;
+
+      const resultado = await MediaLibrary.getAssetsAsync({
+        mediaType: MediaLibrary.MediaType.audio,
+        first: 1000,
+        sortBy: [MediaLibrary.SortBy.default],
+      });
+
+      const mp3s = resultado.assets.filter(item =>
+        item.filename.toLowerCase().endsWith('.mp3')
+      );
+
+      setTotalMusicas(mp3s.length);
+
+      // Tempo estimado total (em segundos)
+      const tempoTotalSegundos = mp3s.reduce((acc, item) => acc + (item.duration || 0), 0);
+      const minutos = Math.floor(tempoTotalSegundos / 60);
+      setTempoTotal(minutos);
+
+      // Música mais reproduzida
+      const mais = await getMostPlayed();
+      if (mais) {
+        const musicaInfo = mp3s.find(m => m.id === mais.id);
+        if (musicaInfo) {
+          setMusicaMaisReproduzida({
+            nome: musicaInfo.filename,
+            total: mais.count
+          });
+        } else {
+          setMusicaMaisReproduzida({
+            nome: '(não encontrada)',
+            total: mais.count
+          });
+        }
+      }
+    }
+
+    carregarEstatisticas();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Estatísticas de Reprodução</Text>
@@ -19,15 +69,15 @@ export default function StatisticsScreen() {
         <MaterialCommunityIcons name="music-note" size={32} color={primaryColor} />
         <View style={styles.textContainer}>
           <Title style={styles.cardTitle}>Total de Músicas</Title>
-          <Paragraph style={styles.cardText}>40 músicas</Paragraph>
+          <Paragraph style={styles.cardText}>{totalMusicas} músicas</Paragraph>
         </View>
       </Surface>
 
       <Surface style={styles.statItem}>
         <MaterialCommunityIcons name="clock-outline" size={32} color={primaryColor} />
         <View style={styles.textContainer}>
-          <Title style={styles.cardTitle}>Tempo Total Reproduzido</Title>
-          <Paragraph style={styles.cardText}>45min</Paragraph>
+          <Title style={styles.cardTitle}>Tempo Total Estimado</Title>
+          <Paragraph style={styles.cardText}>{tempoTotal} min</Paragraph>
         </View>
       </Surface>
 
@@ -35,7 +85,11 @@ export default function StatisticsScreen() {
         <MaterialCommunityIcons name="star" size={32} color={primaryColor} />
         <View style={styles.textContainer}>
           <Title style={styles.cardTitle}>Mais Reproduzida</Title>
-          <Paragraph style={styles.cardText}>"Eminem - The Real Slim Shady"</Paragraph>
+          <Paragraph style={styles.cardText}>
+            {musicaMaisReproduzida
+              ? `${musicaMaisReproduzida.nome} (${musicaMaisReproduzida.total}x)`
+              : 'Nenhuma reprodução ainda'}
+          </Paragraph>
         </View>
       </Surface>
     </View>

@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import { Audio } from 'expo-av';
 import { Text, List, ActivityIndicator, IconButton } from 'react-native-paper';
+import { incrementPlayCount } from '../services/playcount';
 
 export default function HomeScreen() {
   const [musicas, setMusicas] = useState([]);
@@ -61,6 +62,7 @@ export default function HomeScreen() {
       sound.current = novoSom;
       setTocando(musica);
       setIsPlaying(true);
+      await incrementPlayCount(musica.id);
     } catch (error) {
       console.error('Erro ao tocar a música:', error);
     }
