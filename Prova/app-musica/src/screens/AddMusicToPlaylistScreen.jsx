@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet, Alert } from 'react-native';
 import { List, Checkbox, Button, Text } from 'react-native-paper';
 import * as MediaLibrary from 'expo-media-library';
 import { getPlaylists, updatePlaylist } from '../services/storage';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const backgroundColor = '#1a0822';
 const primaryColor = '#912db5';
@@ -12,6 +13,7 @@ export default function AddMusicToPlaylistScreen({ route, navigation }) {
   const { playlistId } = route.params;
   const [musicas, setMusicas] = useState([]);
   const [selecionadas, setSelecionadas] = useState([]);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const carregarMusicas = async () => {
@@ -82,16 +84,17 @@ export default function AddMusicToPlaylistScreen({ route, navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: insets.bottom + 70 }]}>
       <Text style={styles.titulo}>Adicionar músicas à playlist</Text>
       <FlatList
         data={musicas}
         keyExtractor={item => item.id}
+        contentContainerStyle={{ paddingBottom: 20 }}
         renderItem={({ item }) => (
           <List.Item
             title={item.filename}
             style={styles.item}
-            titleStyle={{ color: '#fff' }}
+            titleStyle={{ color: '#fff', fontSize: 14 }}
             left={() => (
               <Checkbox
                 status={selecionadas.some(m => m.id === item.id) ? 'checked' : 'unchecked'}
@@ -102,14 +105,17 @@ export default function AddMusicToPlaylistScreen({ route, navigation }) {
           />
         )}
       />
-      <Button
-        mode="contained"
-        onPress={salvarNaPlaylist}
-        buttonColor={primaryColor}
-        style={{ margin: 16 }}
-      >
-        Salvar músicas na playlist
-      </Button>
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 10 }]}>
+        <Button
+          mode="contained"
+          onPress={salvarNaPlaylist}
+          buttonColor={primaryColor}
+          contentStyle={{ paddingVertical: 6 }}
+          labelStyle={{ fontWeight: 'bold', fontSize: 14 }}
+        >
+          Salvar músicas na playlist
+        </Button>
+      </View>
     </View>
   );
 }
@@ -122,14 +128,23 @@ const styles = StyleSheet.create({
   },
   titulo: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 16,
+    marginTop: 25,
   },
   item: {
     backgroundColor: cardColor,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+  },
+  footer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 16,
+    backgroundColor: backgroundColor,
   },
 });

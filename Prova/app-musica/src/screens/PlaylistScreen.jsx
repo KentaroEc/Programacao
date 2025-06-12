@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Alert, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
-import { List, FAB, Text } from 'react-native-paper';
+import { List, FAB, Text, IconButton } from 'react-native-paper';
 import { useIsFocused } from '@react-navigation/native';
 import { getPlaylists, deletePlaylist } from '../services/storage.js';
 
@@ -51,24 +51,29 @@ export default function PlaylistScreen({ navigation }) {
   };
 
   const renderItem = ({ item }) => (
-    <List.Item
-      title={item.nome}
-      description={item.descricao}
-      titleStyle={{ color: textColor }}
-      descriptionStyle={{ color: '#ccc' }}
-      style={{ backgroundColor: cardColor }}
-      left={props => <List.Icon {...props} icon="playlist-music" color={primaryColor} />}
-      right={props => (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => navigation.navigate('EditarPlaylist', { id: item.id })}>
-            <List.Icon {...props} icon="pencil" color="#aaa" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => confirmarExclusao(item.id)}>
-            <List.Icon {...props} icon="delete" color="#ff5555" />
-          </TouchableOpacity>
-        </View>
-      )}
-    />
+    <TouchableOpacity onPress={() => navigation.navigate('VerPlaylist', { playlistId: item.id })} style={{ flex: 1 }}>
+      <List.Item
+        title={item.nome}
+        description={item.descricao}
+        titleStyle={{ color: textColor }}
+        descriptionStyle={{ color: '#ccc' }}
+        style={{ backgroundColor: cardColor }}
+        left={props => <List.Icon {...props} icon="playlist-music" color={primaryColor} />}
+        right={props => (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => navigation.navigate('AddMusicToPlaylist', { playlistId: item.id })}>
+              <IconButton icon="music-note-plus" size={24} iconColor={primaryColor} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('EditarPlaylist', { id: item.id })}>
+              <List.Icon {...props} icon="pencil" color="#aaa" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => confirmarExclusao(item.id)}>
+              <List.Icon {...props} icon="delete" color="#ff5555" />
+            </TouchableOpacity>
+          </View>
+        )}
+      />
+    </TouchableOpacity>
   );
 
   return (

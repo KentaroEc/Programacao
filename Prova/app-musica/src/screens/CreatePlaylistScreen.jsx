@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 12,
-    backgroundColor: '#2b1b37',
+    backgroundColor: '#fff',
     color: '#fff',
   },
 });

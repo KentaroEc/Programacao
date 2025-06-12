@@ -16,6 +16,7 @@ import CreatePlaylistScreen from './src/screens/CreatePlaylistScreen.jsx';
 import EditPlaylistScreen from './src/screens/EditPlaylistScreen.jsx';
 import StatisticsScreen from './src/screens/StatisticsScreen.jsx';
 import AddMusicToPlaylistScreen from './src/screens/AddMusicToPlaylistScreen.jsx';
+import ViewPlaylistScreen from './src/screens/ViewPlaylistScreen.jsx';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -131,7 +132,8 @@ export default function App() {
           <Stack.Screen name="Drawer" component={DrawerNavigator} />
           <Stack.Screen name="CriarPlaylist" component={CreatePlaylistScreen} />
           <Stack.Screen name="EditarPlaylist" component={EditPlaylistScreen} />
-          <Stack.Screen name="AdicionarMusicas" component={AddMusicToPlaylistScreen} />
+          <Stack.Screen name="AddMusicToPlaylist" component={AddMusicToPlaylistScreen} />
+          <Stack.Screen name="VerPlaylist" component={ViewPlaylistScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>
