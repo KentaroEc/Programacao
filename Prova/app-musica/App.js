@@ -15,9 +15,7 @@ import AboutScreen from './src/screens/AboutScreen.jsx';
 import CreatePlaylistScreen from './src/screens/CreatePlaylistScreen.jsx';
 import EditPlaylistScreen from './src/screens/EditPlaylistScreen.jsx';
 import StatisticsScreen from './src/screens/StatisticsScreen.jsx';
-
-// CONTEXTO DO PLAYER
-// import { PlayerProvider } from './src/contexts/PlayerContext.jsx';
+import AddMusicToPlaylistScreen from './src/screens/AddMusicToPlaylistScreen.jsx';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -25,8 +23,8 @@ const Tabs = createBottomTabNavigator();
 
 // Cores personalizadas
 const primaryColor = '#912db5';
-const backgroundColor = '#1a0822'; // fundo escuro
-const headerColor = '#000';     // topo/cabeçalho
+const backgroundColor = '#1a0822';
+const headerColor = '#000';
 
 function TabNavigator() {
   return (
@@ -120,21 +118,22 @@ function DrawerNavigator() {
 export default function App() {
   return (
     <PaperProvider>
-        <NavigationContainer
-          theme={{
-            ...DefaultTheme,
-            colors: {
-              ...DefaultTheme.colors,
-              background: backgroundColor,
-            },
-          }}
-        >
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Drawer" component={DrawerNavigator} />
-            <Stack.Screen name="CriarPlaylist" component={CreatePlaylistScreen} />
-            <Stack.Screen name="EditarPlaylist" component={EditPlaylistScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
+      <NavigationContainer
+        theme={{
+          ...DefaultTheme,
+          colors: {
+            ...DefaultTheme.colors,
+            background: backgroundColor,
+          },
+        }}
+      >
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Drawer" component={DrawerNavigator} />
+          <Stack.Screen name="CriarPlaylist" component={CreatePlaylistScreen} />
+          <Stack.Screen name="EditarPlaylist" component={EditPlaylistScreen} />
+          <Stack.Screen name="AdicionarMusicas" component={AddMusicToPlaylistScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </PaperProvider>
   );
 }

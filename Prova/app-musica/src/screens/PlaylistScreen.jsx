@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Alert, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Alert, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { List, FAB, Text } from 'react-native-paper';
 import { useIsFocused } from '@react-navigation/native';
 import { getPlaylists, deletePlaylist } from '../services/storage.js';
@@ -11,12 +11,21 @@ const primaryColor = '#912db5';
 
 export default function PlaylistScreen({ navigation }) {
   const [playlists, setPlaylists] = useState([]);
+  const [carregando, setCarregando] = useState(false);
   const isFocused = useIsFocused();
 
   const carregar = async () => {
-    const dados = await getPlaylists();
-    setPlaylists(dados);
-    console.log("Playlists carregadas:", dados);
+    try {
+      setCarregando(true);
+      const dados = await getPlaylists();
+      setPlaylists(dados);
+      console.log("Playlists carregadas:", dados);
+    } catch (error) {
+      console.error("Erro ao carregar playlists:", error);
+      Alert.alert("Erro", "Não foi possível carregar as playlists.");
+    } finally {
+      setCarregando(false);
+    }
   };
 
   useEffect(() => {
@@ -25,12 +34,18 @@ export default function PlaylistScreen({ navigation }) {
 
   const confirmarExclusao = (id) => {
     Alert.alert('Excluir Playlist', 'Deseja mesmo excluir?', [
-      { text: 'Cancelar' },
+      { text: 'Cancelar', style: 'cancel' },
       {
-        text: 'Excluir', onPress: async () => {
-          await deletePlaylist(id);
-          carregar();
-        }
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deletePlaylist(id);
+            carregar();
+          } catch (error) {
+            Alert.alert('Erro', 'Falha ao excluir playlist.');
+          }
+        },
       }
     ]);
   };
@@ -58,7 +73,9 @@ export default function PlaylistScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {playlists.length === 0 ? (
+      {carregando ? (
+        <ActivityIndicator animating={true} color={primaryColor} size="large" style={{ marginTop: 50 }} />
+      ) : playlists.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma playlist criada ainda.</Text>
       ) : (
         <FlatList

@@ -24,6 +24,7 @@ export const savePlaylists = async (playlists) => {
 export const addPlaylist = async (playlist) => {
   try {
     const playlists = await getPlaylists();
+    console.log('Playlist recebida para adicionar:', playlist);
     console.log('Playlists antes de adicionar:', playlists);
     playlists.push(playlist);
     console.log('Playlists após adicionar:', playlists);
@@ -34,13 +35,23 @@ export const addPlaylist = async (playlist) => {
 };
 
 export const updatePlaylist = async (id, newData) => {
-  let playlists = await getPlaylists();
-  playlists = playlists.map(p => p.id === id ? { ...p, ...newData } : p);
-  await savePlaylists(playlists);
+  try {
+    const playlists = await getPlaylists();
+    const atualizadas = playlists.map(p =>
+      p.id === id ? { ...p, ...newData } : p
+    );
+    await savePlaylists(atualizadas);
+  } catch (error) {
+    console.error("Erro ao atualizar playlist:", error);
+  }
 };
 
 export const deletePlaylist = async (id) => {
-  let playlists = await getPlaylists();
-  playlists = playlists.filter(p => p.id !== id);
-  await savePlaylists(playlists);
+  try {
+    const playlists = await getPlaylists();
+    const filtradas = playlists.filter(p => p.id !== id);
+    await savePlaylists(filtradas);
+  } catch (error) {
+    console.error("Erro ao deletar playlist:", error);
+  }
 };

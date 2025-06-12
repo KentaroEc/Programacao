@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Text, IconButton } from 'react-native-paper';
+import { View, StyleSheet, Image } from 'react-native';
+import { Text, IconButton, Surface } from 'react-native-paper';
 import * as MediaLibrary from 'expo-media-library';
 import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
@@ -14,7 +14,6 @@ export default function PlayerScreen() {
   const [tocando, setTocando] = useState(false);
   const [posicao, setPosicao] = useState(0);
   const [duracao, setDuracao] = useState(1);
-
   const soundRef = useRef(null);
 
   useEffect(() => {
@@ -64,7 +63,6 @@ export default function PlayerScreen() {
       if (status.isLoaded) {
         setDuracao(status.durationMillis || 1);
         setPosicao(status.positionMillis || 0);
-
         if (status.didJustFinish) {
           proximaMusica();
         }
@@ -75,7 +73,6 @@ export default function PlayerScreen() {
   const pausarOuContinuar = async () => {
     if (!soundRef.current) return;
     const status = await soundRef.current.getStatusAsync();
-
     if (status.isPlaying) {
       await soundRef.current.pauseAsync();
       setTocando(false);
@@ -87,7 +84,6 @@ export default function PlayerScreen() {
 
   const proximaMusica = async () => {
     if (musicas.length === 0) return;
-
     let novoIndex = indexAtual + 1;
     if (novoIndex >= musicas.length) novoIndex = 0;
     setIndexAtual(novoIndex);
@@ -96,7 +92,6 @@ export default function PlayerScreen() {
 
   const musicaAnterior = async () => {
     if (musicas.length === 0) return;
-
     let novoIndex = indexAtual - 1;
     if (novoIndex < 0) novoIndex = musicas.length - 1;
     setIndexAtual(novoIndex);
@@ -118,49 +113,46 @@ export default function PlayerScreen() {
 
   return (
     <View style={estilos.container}>
-      <Text variant="titleLarge" style={estilos.texto}>
-        {musicas.length > 0 ? musicas[indexAtual].filename : 'Nenhuma música carregada'}
-      </Text>
+      <Surface style={estilos.card}>
+        <Image
+          source={require('../assets/music-placeholder.png')} // substitua por imagem real, se desejar
+          style={estilos.imagem}
+        />
 
-      {musicas.length > 0 && (
-        <>
-          <Slider
-            style={{ width: 300, height: 40 }}
-            minimumValue={0}
-            maximumValue={duracao}
-            value={posicao}
-            onSlidingComplete={aoSoltarSlider}
-            minimumTrackTintColor="#fff"
-            maximumTrackTintColor="#888"
-            thumbTintColor="#fff"
+        <Text variant="titleLarge" style={estilos.titulo}>
+          {musicas.length > 0 ? musicas[indexAtual].filename : 'Nenhuma música carregada'}
+        </Text>
+
+        {musicas.length > 0 && (
+          <>
+            <Slider
+              style={estilos.slider}
+              minimumValue={0}
+              maximumValue={duracao}
+              value={posicao}
+              onSlidingComplete={aoSoltarSlider}
+              minimumTrackTintColor={primaryColor}
+              maximumTrackTintColor="#888"
+              thumbTintColor="#fff"
+            />
+            <View style={estilos.tempos}>
+              <Text style={estilos.tempoTexto}>{formatarTempo(posicao)}</Text>
+              <Text style={estilos.tempoTexto}>{formatarTempo(duracao)}</Text>
+            </View>
+          </>
+        )}
+
+        <View style={estilos.controles}>
+          <IconButton icon="skip-previous" size={36} iconColor="#fff" onPress={musicaAnterior} />
+          <IconButton
+            icon={tocando ? "pause-circle" : "play-circle"}
+            size={60}
+            iconColor="#fff"
+            onPress={tocando ? pausarOuContinuar : tocarMusica}
           />
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: 300 }}>
-            <Text style={{ color: '#ccc' }}>{formatarTempo(posicao)}</Text>
-            <Text style={{ color: '#ccc' }}>{formatarTempo(duracao)}</Text>
-          </View>
-        </>
-      )}
-
-      <View style={estilos.controles}>
-        <IconButton
-          icon="skip-previous"
-          size={40}
-          iconColor="#fff"
-          onPress={musicaAnterior}
-        />
-        <IconButton
-          icon={tocando ? "pause" : "play"}
-          size={40}
-          iconColor="#fff"
-          onPress={tocando ? pausarOuContinuar : tocarMusica}
-        />
-        <IconButton
-          icon="skip-next"
-          size={40}
-          iconColor="#fff"
-          onPress={proximaMusica}
-        />
-      </View>
+          <IconButton icon="skip-next" size={36} iconColor="#fff" onPress={proximaMusica} />
+        </View>
+      </Surface>
     </View>
   );
 }
@@ -168,20 +160,49 @@ export default function PlayerScreen() {
 const estilos = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: backgroundColor,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: backgroundColor,
     padding: 20,
   },
-  texto: {
+  card: {
+    backgroundColor: '#2b1b37',
+    borderRadius: 16,
+    padding: 20,
+    width: '100%',
+    alignItems: 'center',
+    elevation: 4,
+  },
+  imagem: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
     marginBottom: 20,
-    textAlign: 'center',
+  },
+  titulo: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  slider: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  tempos: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 10,
+  },
+  tempoTexto: {
+    color: '#ccc',
+    fontSize: 12,
   },
   controles: {
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 20,
     marginTop: 10,
   },

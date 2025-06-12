@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, Alert, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
-import { addPlaylist, getPlaylists } from '../services/storage.js';
-import { v4 as uuidv4 } from 'uuid';
+import { addPlaylist } from '../services/storage.js';
 
 const primaryColor = '#912db5';
 const backgroundColor = '#1a0822';
@@ -15,6 +14,8 @@ export default function CreatePlaylistScreen({ navigation }) {
     criador: '',
     ano: '',
   });
+
+  const [carregando, setCarregando] = useState(false);
 
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });
@@ -29,20 +30,47 @@ export default function CreatePlaylistScreen({ navigation }) {
     }
 
     const novaPlaylist = {
-      id: uuidv4(),
+      id: Date.now().toString(), // substituindo uuidv4()
       ...form,
     };
 
     try {
+      setCarregando(true);
+      console.log('Salvando playlist:', novaPlaylist);
+
       await addPlaylist(novaPlaylist);
+
       Alert.alert('Sucesso!', 'Playlist salva com sucesso!');
-      navigation.navigate('Drawer', {
-        screen: 'Início',
-        params: { screen: 'Playlists' }
+
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Drawer',
+            state: {
+              routes: [
+                {
+                  name: 'Início',
+                  state: {
+                    routes: [
+                      { name: 'Biblioteca' },
+                      { name: 'Playlists' }
+                    ],
+                    index: 1
+                  }
+                }
+              ],
+              index: 0
+            }
+          }
+        ]
       });
+
     } catch (error) {
       console.error("Erro ao salvar playlist:", error);
-      Alert.alert('Erro ao salvar a playlist.');
+      Alert.alert('Erro', 'Não foi possível salvar a playlist.');
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -92,8 +120,15 @@ export default function CreatePlaylistScreen({ navigation }) {
         theme={inputTheme}
       />
 
-      <Button mode="contained" onPress={salvar} buttonColor={primaryColor}>
-        Salvar
+      <Button
+        mode="contained"
+        onPress={salvar}
+        buttonColor={primaryColor}
+        loading={carregando}
+        disabled={carregando}
+        style={{ marginTop: 10 }}
+      >
+        {carregando ? 'Salvando...' : 'Salvar'}
       </Button>
     </ScrollView>
   );
@@ -123,6 +158,6 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 12,
     backgroundColor: '#2b1b37',
-    color: '#fff', // <- isso garante que o texto dentro apareça branco
+    color: '#fff',
   },
 });
